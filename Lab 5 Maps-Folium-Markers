@@ -1,0 +1,295 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Oct  3 15:07:08 2021
+
+@author: Shawn Temes
+"""
+
+
+
+
+"""
+Folium:
+Folium builds on the data wrangling strengths of the Python ecosystem and the mapping strengths of the Leaflet.js library. Manipulate your data in Python, then visualize it in on a Leaflet map via Folium.
+"""
+import numpy as np  # useful for many scientific computing in Python
+import pandas as pd # primary data structure library
+
+!conda install -c conda-forge folium=0.5.0 --yes
+import folium
+
+print('Folium installed and imported!')
+
+#create map in 2 lines of code
+# define the world map
+world_map = folium.Map()
+# display world map
+world_map
+
+#need to save map as html, doesn't work in anaconda spyder 
+world_map.save("mymap.html")
+
+#create map of Canada
+# define the world map centered around Canada with a low zoom level
+world_map = folium.Map(location=[56.130, -106.35], zoom_start=4)
+
+# display world map
+world_map
+#need to save map as html, doesn't work in anaconda spyder 
+world_map.save("mymap.html")
+
+
+#same map higher zoom
+# define the world map centered around Canada with a higher zoom level
+world_map = folium.Map(location=[56.130, -106.35], zoom_start=8)
+
+# display world map
+world_map
+
+#map of mexico
+#define Mexico's geolocation coordinates
+mexico_latitude = 23.6345 
+mexico_longitude = -102.5528
+mexico_map = folium.Map(location=[mexico_latitude, mexico_longitude], zoom_start=4)
+# display world map
+mexico_map
+#save map
+mexico_map.save("mymap.html")
+
+
+#Stamen Toner Map:These are high-contrast B+W (black and white) maps. They are perfect for data mashups and exploring river meanders and coastal zones.
+# create a Stamen Toner map of the world centered around Canada
+world_map = folium.Map(location=[56.130, -106.35], zoom_start=4, tiles='Stamen Toner')
+
+# display map
+world_map
+
+#Stamen Terrain Map:These are maps that feature hill shading and natural vegetation colors. They showcase advanced labeling and linework generalization of dual-carriageway roads.
+# create a Stamen Toner map of the world centered around Canada
+world_map = folium.Map(location=[56.130, -106.35], zoom_start=4, tiles='Stamen Terrain')
+
+# display map
+world_map
+
+
+#Maps With Markers
+#Let's download and import the data on police department incidents using pandas read_csv() method.
+#Download the dataset and read it into a pandas dataframe:
+df_incidents = pd.read_csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DV0101EN-SkillsNetwork/Data%20Files/Police_Department_Incidents_-_Previous_Year__2016_.csv')
+
+print('Dataset downloaded and read into a pandas dataframe!')
+#read first 5
+"""
+#each row consists of 13 features:
+IncidntNum: Incident Number
+Category: Category of crime or incident
+Descript: Description of the crime or incident
+DayOfWeek: The day of week on which the incident occurred
+Date: The Date on which the incident occurred
+Time: The time of day on which the incident occurred
+PdDistrict: The police department district
+Resolution: The resolution of the crime in terms whether the perpetrator was arrested or not
+Address: The closest address to where the incident took place
+X: The longitude value of the crime location
+Y: The latitude value of the crime location
+Location: A tuple of the latitude and the longitude values
+PdId: The police department ID
+"""
+#rows/columns
+df_incidents.shape
+
+# get the first 100 crimes in the df_incidents dataframe
+limit = 100
+df_incidents = df_incidents.iloc[0:limit, :]
+#confirm it consists of only 100
+df_incidents.shape
+#Map if San Francisco
+# San Francisco latitude and longitude values
+latitude = 37.77
+longitude = -122.42
+# create map and display it
+sanfran_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+
+# display the map of San Francisco
+sanfran_map
+
+#superimpose the locations of the crimes onto the map. The way to do that in Folium is to create a *feature group*
+# instantiate a feature group for the incidents in the dataframe
+incidents = folium.map.FeatureGroup()
+
+# loop through the 100 crimes and add each to the incidents feature group
+for lat, lng, in zip(df_incidents.Y, df_incidents.X):
+    incidents.add_child(
+        folium.features.CircleMarker(
+            [lat, lng],
+            radius=5, # define how big you want the circle markers to be
+            color='yellow',
+            fill=True,
+            fill_color='blue',
+            fill_opacity=0.6
+        )
+    )
+
+# add incidents to map
+sanfran_map.add_child(incidents)
+#save to view html
+sanfran_map.save("mymap.html")
+
+
+#add some pop-up text that would get displayed when you hover over a marker. Let's make each marker display the category of the crime when hovered over.
+# instantiate a feature group for the incidents in the dataframe
+incidents = folium.map.FeatureGroup()
+
+# loop through the 100 crimes and add each to the incidents feature group
+for lat, lng, in zip(df_incidents.Y, df_incidents.X):
+    incidents.add_child(
+        folium.features.CircleMarker(
+            [lat, lng],
+            radius=5, # define how big you want the circle markers to be
+            color='yellow',
+            fill=True,
+            fill_color='blue',
+            fill_opacity=0.6
+        )
+    )
+
+# add pop-up text to each marker on the map
+latitudes = list(df_incidents.Y)
+longitudes = list(df_incidents.X)
+labels = list(df_incidents.Category)
+
+for lat, lng, label in zip(latitudes, longitudes, labels):
+    folium.Marker([lat, lng], popup=label).add_to(sanfran_map)    
+    
+# add incidents to map
+sanfran_map.add_child(incidents
+#save to view
+sanfran_map.save("Crimemap.html")
+
+#If you find the map to be so congested will all these markers, there are two remedies to this problem. The simpler solution is to remove these location markers and just add the text to the circle markers themselves as follows:
+# create map and display it
+sanfran_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+​
+# loop through the 100 crimes and add each to the map
+for lat, lng, label in zip(df_incidents.Y, df_incidents.X, df_incidents.Category):
+    folium.features.CircleMarker(
+        [lat, lng],
+        radius=5, # define how big you want the circle markers to be
+        color='yellow',
+        fill=True,
+        popup=label,
+        fill_color='blue',
+        fill_opacity=0.6
+    ).add_to(sanfran_map)
+​
+# show map
+sanfran_map
+
+#The other proper remedy is to group the markers into different clusters. Each cluster is then represented by the number of crimes in each neighborhood. These clusters can be thought of as pockets of San Francisco which you can then analyze separately.
+#To implement this, we start off by instantiating a MarkerCluster object and adding all the data points in the dataframe to this object
+from folium import plugins
+
+# let's start again with a clean copy of the map of San Francisco
+sanfran_map = folium.Map(location = [latitude, longitude], zoom_start = 12)
+
+# instantiate a mark cluster object for the incidents in the dataframe
+incidents = plugins.MarkerCluster().add_to(sanfran_map)
+
+# loop through the dataframe and add each data point to the mark cluster
+for lat, lng, label, in zip(df_incidents.Y, df_incidents.X, df_incidents.Category):
+    folium.Marker(
+        location=[lat, lng],
+        icon=None,
+        popup=label,
+    ).add_to(incidents)
+
+# display map
+sanfran_map
+
+
+#A Choropleth map is a thematic map in which areas are shaded or patterned in proportion to the measurement of the statistical variable being displayed on the map, such as population density or per-capita income.
+#
+
+df_can = pd.read_excel(
+    'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DV0101EN-SkillsNetwork/Data%20Files/Canada.xlsx',
+    sheet_name='Canada by Citizenship',
+    skiprows=range(20),
+    skipfooter=2)
+
+print('Data downloaded and read into a dataframe!')
+
+#Clean data
+# clean up the dataset to remove unnecessary columns (eg. REG) 
+df_can.drop(['AREA','REG','DEV','Type','Coverage'], axis=1, inplace=True)
+
+# let's rename the columns so that they make sense
+df_can.rename(columns={'OdName':'Country', 'AreaName':'Continent','RegName':'Region'}, inplace=True)
+
+# for sake of consistency, let's also make all column labels of type string
+df_can.columns = list(map(str, df_can.columns))
+
+# add total column
+df_can['Total'] = df_can.sum(axis=1)
+
+# years that we will be using in this lesson - useful for plotting later on
+years = list(map(str, range(1980, 2014)))
+print ('data dimensions:', df_can.shape)
+
+#n order to create a Choropleth map, we need a GeoJSON file that defines the areas/boundaries of the state, county, or country that we are interested in. In our case, since we are endeavoring to create a world map, we want a GeoJSON that defines the boundaries of all world countries
+# download countries geojson file
+! wget --quiet https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DV0101EN-SkillsNetwork/Data%20Files/world_countries.json
+    
+print('GeoJSON file downloaded!')
+
+world_geo = r'world_countries.json' # geojson file
+
+# create a plain world map
+world_map = folium.Map(location=[0, 0], zoom_start=2)
+
+"""
+geo_data, which is the GeoJSON file.
+data, which is the dataframe containing the data.
+columns, which represents the columns in the dataframe that will be used to create the Choropleth map.
+key_on, which is the key or variable in the GeoJSON file that contains the name of the variable of interest. To determine that, you will need to open the GeoJSON file using any text editor and note the name of the key or variable that contains the name of the countries, since the countries are our variable of interest. In this case, name is the key in the GeoJSON file that contains the name of the countries. Note that this key is case_sensitive, so you need to pass exactly as it exists in the GeoJSON file.
+"""
+# generate choropleth map using the total immigration of each country to Canada from 1980 to 2013
+world_map.choropleth(
+    geo_data=world_geo,
+    data=df_can,
+    columns=['Country', 'Total'],
+    key_on='feature.properties.name',
+    fill_color='YlOrRd', 
+    fill_opacity=0.7, 
+    line_opacity=0.2,
+    legend_name='Immigration to Canada'
+)
+
+# display map
+world_map
+
+
+#
+world_geo = r'world_countries.json'
+
+# create a numpy array of length 6 and has linear spacing from the minimum total immigration to the maximum total immigration
+threshold_scale = np.linspace(df_can['Total'].min(),
+                              df_can['Total'].max(),
+                              6, dtype=int)
+threshold_scale = threshold_scale.tolist() # change the numpy array to a list
+threshold_scale[-1] = threshold_scale[-1] + 1 # make sure that the last value of the list is greater than the maximum immigration
+
+# let Folium determine the scale.
+world_map = folium.Map(location=[0, 0], zoom_start=2)
+world_map.choropleth(
+    geo_data=world_geo,
+    data=df_can,
+    columns=['Country', 'Total'],
+    key_on='feature.properties.name',
+    threshold_scale=threshold_scale,
+    fill_color='YlOrRd', 
+    fill_opacity=0.7, 
+    line_opacity=0.2,
+    legend_name='Immigration to Canada',
+    reset=True
+)
+world_map
