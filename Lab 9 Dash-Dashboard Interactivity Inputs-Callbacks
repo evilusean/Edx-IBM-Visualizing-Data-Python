@@ -1,0 +1,30 @@
+
+    # Group the data by Month and compute average over arrival delay time.
+    line_data = df.groupby('Month')['ArrDelay'].mean().reset_index()
+
+    # 
+    fig = go.Figure(data=)
+    fig.update_layout()
+    return fig
+
+# Run the app
+if __name__ == '__main__':
+    app.run_server()
+"""
+To Do:
+Callback decorator
+Refer examples provided here
+Update output component id parameter with the id provided in the dcc.Graph() component and component property as figure.
+Update input component id parameter with the id provided in the dcc.Input() component and component property as value.
+Callback function
+Update data parameter of the go.Figure() with the scatter plot. Refer here. Sample syntax below:
+go.Scatter(x='----', y='----', mode='-----', marker='----)
+Update x as line_data['Month'], y as line_data['ArrDelay'], mode as lines, and marker as dict(color='green').
+
+Update fig.update_layout with title, xaxistitle, and yaxistitle parameters.
+
+Title as Month vs Average Flight Delay Time
+xaxis_title as Month
+yaxis_title as ArrDelay 
+"""
+
