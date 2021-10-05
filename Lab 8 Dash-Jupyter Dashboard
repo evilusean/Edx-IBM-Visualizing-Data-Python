@@ -1,0 +1,83 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct  5 11:14:13 2021
+
+@author: Shawn Temes
+"""
+# Import required packages
+import pandas as pd
+import plotly.express as px
+# Read the airline data into pandas dataframe
+# Read the airline data into pandas dataframe
+airline_data =  pd.read_csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DV0101EN-SkillsNetwork/Data%20Files/airline_data.csv', 
+                            encoding = "ISO-8859-1",
+                            dtype={'Div1Airport': str, 'Div1TailNum': str, 
+                                   'Div2Airport': str, 'Div2TailNum': str})
+# Preview the first 5 lines of the loaded data 
+airline_data.head()
+# Shape of the data
+airline_data.shape
+
+# Randomly sample 500 data points. Setting the random state to be 42 so that we get same result.
+data = airline_data.sample(n=500, random_state=42)
+
+# Pie Chart Creation
+fig = px.pie(data, values='Month', names='DistanceGroup', title='Distance group proportion by month')
+fig.show()
+"""
+Creating a Dash:
+    https://dash.plotly.com/layout
+    documentation/tutorial
+standard layout/skeleton:
+import dash
+
+from jupyter_dash import JupyterDash
+
+
+app = JupyterDash(__name__)
+JupyterDash.infer_jupyter_proxy_config()
+
+
+app.layout = html.Div(children=[html.H1(.......),
+                                html.P(.......),
+                                dcc.Graph(......)
+                               ]
+                      )
+if __name__ == '__main__':
+    app.run_server(mode="inline", host="localhost")
+"""
+import dash
+import dash_html_components as html
+import dash_core_components as dcc
+from jupyter_dash import JupyterDash
+
+
+
+app = JupyterDash(__name__)
+#app = dash.Dash(__name__)
+
+# Import required libraries
+import dash
+import dash_html_components as html
+import dash_core_components as dcc
+from jupyter_dash import JupyterDash
+
+# Create a dash application
+app = JupyterDash(__name__)
+JupyterDash.infer_jupyter_proxy_config()
+
+# Get the layout of the application and adjust it.
+# Create an outer division using html.Div and add title to the dashboard using html.H1 component
+# Add description about the graph using HTML P (paragraph) component
+# Finally, add graph component.
+app.layout = html.Div(children=[html.H1('Airline Dashboard', 
+                                         style={'textAlign': 'center',
+                                                'color': '#503D36',
+                                                 'font-size': 40}),
+                                html.P('Proportion of distance group (250 mile distance interval group) by month (month indicated by numbers).',
+                                        style={'textAlign':'center', 'color': '#F57241'}),
+                                dcc.Graph(figure=fig),
+                                               
+                    ])
+if __name__ == '__main__':
+    app.run_server(mode="inline", host="localhost")
